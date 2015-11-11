@@ -23,7 +23,7 @@
 
 (deftest binsearch-test
   (testing "not found test1"
-    (nil? (bs/binsearch []  1)))
+    (is (nil? (bs/binsearch []  1))))
   
   (testing "binsearch test1"
     (is (= 2 (bs/binsearch [1 3 4 6 8 9 11] 4))))
@@ -41,7 +41,7 @@
     (is (= 6 (bs/binsearch [1 2 3 4 8 9 11] 11))))
   
   (testing "not found test2"
-    (nil? (bs/binsearch [1 2 3] 4)))
+    (is (nil? (bs/binsearch [1 2 3] 4))))
   
   (testing "not found test3"
-    (nil? (bs/binsearch [-1 2 4] 0))))
+    (is (nil? (bs/binsearch [-1 2 4] 0)))))

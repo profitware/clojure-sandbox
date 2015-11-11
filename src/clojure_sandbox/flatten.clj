@@ -1,13 +1,17 @@
 (ns clojure-sandbox.flatten
+  (:require [clojure.walk :as w])
   (:gen-class))
 
-(defn flatten-list
-  ([]
-    (list))
-  ([first-element & rest-list]
-    (println first-element "and" rest-list)
-    (if (empty? rest-list)
-      (list first-element)
-      (if (list? first-element)
-        (concat first-element (apply flatten-list rest-list))
-        (cons first-element (apply flatten-list rest-list))))))
+(defn flatten-list [args]
+  (def accumulator (list))
+  (defn flatten-list-inner
+    ([args-inner]
+      (if (list? args-inner)
+        (do
+          (def x (w/walk flatten-list-inner concat args-inner))
+          x)
+        (do
+          (def accumulator (cons args-inner accumulator))
+          args-inner))))
+  (flatten-list-inner args)
+  (reverse accumulator))
