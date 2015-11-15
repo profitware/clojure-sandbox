@@ -7,11 +7,12 @@
     (list))
   
   ([& args]
-    (def accumulator (list))
+    (def accumulator (atom []))
     (defn flatten-list-inner
       ([args-inner]
         (if (seq? args-inner)
           (w/walk flatten-list-inner concat args-inner)
-          (def accumulator (cons args-inner accumulator)))))
+          (swap! accumulator conj args-inner))))
     (flatten-list-inner args)
-    (reverse accumulator)))
+    (let [[& out-list] @accumulator]
+      out-list)))
