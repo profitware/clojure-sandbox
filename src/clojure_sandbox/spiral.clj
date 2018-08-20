@@ -11,35 +11,32 @@
                                          (apply concat
                                                 (for [n (range num 0 -1)]
                                                   [n n]))))
-        index-dict (loop [dict {}
-                          x 0
-                          y 0
-                          value (* num num)
-                          turn 0
-                          steps-till-turn num]
-                     (let [new-dict (assoc dict [x y] value)
-                           [x-inc y-inc] (get turn-dict
-                                              (mod turn 4))
-                           new-x (+ x x-inc)
-                           new-y (+ y y-inc)
-                           new-value (dec value)
-                           steps-next-turn (get steps-till-turn-list turn)
-                           new-steps-till-turn (let [x (dec steps-till-turn)]
-                                                 (if (< x 1)
-                                                   steps-next-turn
-                                                   x))
-                           new-turn (if (and new-steps-till-turn
-                                             (> new-steps-till-turn 1))
-                                      turn
-                                      (inc turn))]
-                       (if new-steps-till-turn
-                         (recur new-dict
-                                new-x
-                                new-y
-                                new-value
-                                new-turn
-                                new-steps-till-turn)
-                         new-dict)))]
+        reduced-dict (reduce (fn [acc value]
+                               (let [{x :x
+                                      y :y
+                                      turn :turn
+                                      steps-till-turn :steps-till-turn} acc
+                                     [x-inc y-inc] (get turn-dict
+                                                        (mod turn 4))
+                                     steps-next-turn (get steps-till-turn-list turn)
+                                     new-steps-till-turn (let [x (dec steps-till-turn)]
+                                                           (if (< x 1)
+                                                             steps-next-turn
+                                                             x))]
+                                 (assoc acc
+                                        [x y] value
+                                        :x (+ x x-inc)
+                                        :y (+ y y-inc)
+                                        :steps-till-turn new-steps-till-turn
+                                        :turn (if (and new-steps-till-turn
+                                                       (> new-steps-till-turn 1))
+                                                turn
+                                                (inc turn)))))
+                             {:x 0
+                              :y 0
+                              :turn 0
+                              :steps-till-turn num}
+                             (range (* num num) 0 -1))]
     (loop [y 0
            full-string ""]
       (let [line (loop [x 0
@@ -47,7 +44,7 @@
                    (if (< x num)
                      (recur (inc x)
                             (str string
-                                 (get index-dict [x y])
+                                 (get reduced-dict [x y])
                                  (when (< (inc x) num)
                                    " ")))
                      string))]
