@@ -55,3 +55,22 @@
 
 ;; Chapter 3
 
+(defprotocol MonoidProto
+  (mappend [monoid m n])
+  (mempty [monoid]))
+
+
+(defrecord Monoid [mappend-func mempty-value]
+  MonoidProto
+  (mappend [monoid m n] (apply mappend-func [m n]))
+  (mempty [monoid] mempty-value))
+
+
+(def numeric-monoid (->Monoid + 0))
+(def string-monoid (->Monoid str ""))
+(def bool-true-monoid (->Monoid #(and %1 %2) true))
+(def bool-false-monoid (->Monoid #(or %1 %2) false))
+(def numeric-add-modulo-monoid-factory (fn [divisor]
+                                         (->Monoid (comp #(mod % divisor) +)
+                                                   divisor)))
+(def numeric-add-modulo3-monoid (numeric-add-modulo-monoid-factory 3))
